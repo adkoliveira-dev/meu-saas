@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guia Completo – Do Zero ao Dinheiro</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Outfit', sans-serif; background: #f0f4ff; color: #1e1b4b; line-height: 1.6; }
+
+  .hero {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+    color: #fff; padding: 60px 24px; text-align: center; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(139,92,246,0.4) 0%, transparent 60%);
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
+  .badge { display: inline-block; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 99px; padding: 6px 18px; font-size: 13px; color: #c7d2fe; letter-spacing: 1px; margin-bottom: 20px; font-weight: 600; }
+  .hero h1 { font-size: clamp(28px, 5vw, 48px); font-weight: 900; line-height: 1.15; margin-bottom: 16px; }
+  .hero h1 span { background: linear-gradient(90deg, #a5b4fc, #f0abfc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p { color: #a5b4fc; font-size: 17px; max-width: 500px; margin: 0 auto; }
+
+  .container { max-width: 780px; margin: 0 auto; padding: 48px 20px; }
+
+  .intro-box {
+    background: #fff; border-radius: 20px; padding: 28px; margin-bottom: 36px;
+    border-left: 5px solid #6366f1; box-shadow: 0 4px 24px rgba(99,102,241,0.1);
+  }
+  .intro-box h2 { color: #4338ca; font-size: 20px; margin-bottom: 10px; }
+  .intro-box p { color: #475569; font-size: 15px; line-height: 1.7; }
+
+  .step {
+    background: #fff; border-radius: 20px; padding: 28px; margin-bottom: 20px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06); position: relative; overflow: hidden;
+  }
+  .step::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  }
+  .step-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+  .step-num {
+    min-width: 48px; height: 48px; border-radius: 14px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff; font-weight: 900; font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step-title { font-size: 20px; font-weight: 800; color: #1e1b4b; margin-bottom: 4px; }
+  .step-subtitle { font-size: 14px; color: #94a3b8; }
+  .step-body { color: #475569; font-size: 15px; line-height: 1.75; }
+  .step-body b { color: #4338ca; }
+
+  .action-list { list-style: none; margin: 14px 0; }
+  .action-list li {
+    display: flex; align-items: flex-start; gap: 12px; padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9; font-size: 15px; color: #374151;
+  }
+  .action-list li:last-child { border-bottom: none; }
+  .action-list .num {
+    min-width: 26px; height: 26px; border-radius: 50%;
+    background: #ede9fe; color: #6366f1; font-weight: 800; font-size: 13px;
+    display: flex; align-items: center; justify-content: center; margin-top: 1px;
+  }
+
+  .tip {
+    background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px;
+    padding: 14px 16px; margin-top: 14px; font-size: 14px; color: #166534;
+  }
+  .tip strong { font-weight: 700; }
+
+  .warning {
+    background: #fffbeb; border: 1px solid #fcd34d; border-radius: 12px;
+    padding: 14px 16px; margin-top: 14px; font-size: 14px; color: #92400e;
+  }
+
+  .link-box {
+    background: #ede9fe; border-radius: 10px; padding: 12px 16px;
+    font-size: 14px; margin: 10px 0; display: flex; align-items: center; gap: 10px;
+  }
+  .link-box a { color: #4338ca; font-weight: 700; text-decoration: none; }
+  .link-box a:hover { text-decoration: underline; }
+
+  .money-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  .money-table th { background: #6366f1; color: #fff; padding: 12px 16px; text-align: left; font-weight: 700; }
+  .money-table td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; color: #374151; }
+  .money-table tr:nth-child(even) td { background: #f8f7ff; }
+  .money-table .highlight td { background: #ede9fe !important; font-weight: 700; color: #4338ca; }
+
+  .final-box {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+    border-radius: 20px; padding: 36px; text-align: center; color: #fff; margin-top: 36px;
+  }
+  .final-box h2 { font-size: 26px; font-weight: 900; margin-bottom: 12px; }
+  .final-box p { opacity: 0.9; font-size: 15px; line-height: 1.7; max-width: 500px; margin: 0 auto; }
+
+  .tag { display: inline-block; background: #ede9fe; color: #6366f1; border-radius: 99px; padding: 3px 10px; font-size: 12px; font-weight: 700; margin: 2px; }
+  .tag.green { background: #dcfce7; color: #166534; }
+  .tag.yellow { background: #fef9c3; color: #854d0e; }
+
+  code { background: #1e1b4b; color: #a5b4fc; padding: 2px 8px; border-radius: 6px; font-size: 13px; font-family: monospace; }
+
+  @media (max-width: 600px) {
+    .step-header { flex-direction: column; gap: 10px; }
+    .step-num { width: 40px; height: 40px; font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-content">
+    <div class="badge">📖 GUIA COMPLETO PARA INICIANTES</div>
+    <h1>Do <span>Zero ao Dinheiro</span><br>com seu SaaS de IA</h1>
+    <p>Passo a passo completo para publicar, divulgar e receber seus primeiros pagamentos — sem gastar nada</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="intro-box">
+    <h2>🎯 O que você vai construir</h2>
+    <p>
+      Você tem em mãos um <b>SaaS</b> (Software como Serviço) — uma ferramenta online que gera conteúdo com IA para pequenos negócios. 
+      Donos de restaurantes, lojas, clínicas, personal trainers... todos precisam postar nas redes mas não têm tempo nem habilidade. 
+      <b>Você resolve isso para eles, automaticamente.</b>
+      <br><br>
+      O modelo é simples: eles pagam uma mensalidade, você tem uma renda recorrente. 
+      Com apenas <b>10 clientes no plano Básico (R$97/mês)</b>, você já faz R$970/mês — trabalhando de qualquer lugar.
+    </p>
+  </div>
+
+  <!-- PASSO 1 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Criar sua conta no GitHub <span class="tag">10 min</span></div>
+        <div class="step-subtitle">O "armazém" onde seu site vai ficar guardado — 100% grátis</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>O GitHub é onde o código do seu site fica guardado. Pense nele como um Google Drive para programadores. Você não precisa entender nada de programação — só precisa criar a conta e subir os arquivos.</p>
+      <ul class="action-list">
+        <li><div class="num">1</div><div>Abra o site <b>github.com</b> no seu computador</div></li>
+        <li><div class="num">2</div><div>Clique em <b>"Sign up"</b> (canto superior direito)</div></li>
+        <li><div class="num">3</div><div>Coloque seu email, crie uma senha e escolha um nome de usuário (ex: <code>joaosilva</code>)</div></li>
+        <li><div class="num">4</div><div>Confirme seu email quando chegar a mensagem</div></li>
+        <li><div class="num">5</div><div>Clique em <b>"New repository"</b> → nomeie de <code>meu-saas</code> → marque "Public" → clique <b>"Create repository"</b></div></li>
+      </ul>
+      <div class="tip">✅ <strong>Pronto!</strong> Você criou seu repositório. É aqui que vamos guardar os arquivos do seu produto.</div>
+    </div>
+  </div>
+
+  <!-- PASSO 2 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Subir os arquivos do produto <span class="tag">15 min</span></div>
+        <div class="step-subtitle">Colocar o código que o Claude criou no GitHub</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Os arquivos que o Claude gerou precisam ir para o GitHub. Veja como fazer isso sem mexer em nada técnico:</p>
+      <ul class="action-list">
+        <li><div class="num">1</div><div>Baixe os arquivos que o Claude criou no seu computador</div></li>
+        <li><div class="num">2</div><div>No seu repositório do GitHub, clique em <b>"uploading an existing file"</b></div></li>
+        <li><div class="num">3</div><div>Arraste os arquivos para a área indicada na tela</div></li>
+        <li><div class="num">4</div><div>Clique em <b>"Commit changes"</b> (botão verde)</div></li>
+      </ul>
+      <div class="tip">✅ Seus arquivos estão salvos na nuvem agora!</div>
+    </div>
+  </div>
+
+  <!-- PASSO 3 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Publicar o site no Vercel <span class="tag">10 min</span></div>
+        <div class="step-subtitle">Colocar seu produto online para o mundo acessar — grátis para sempre</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>O Vercel transforma seu código em um site real com link para acessar. É grátis e leva menos de 5 minutos.</p>
+      <ul class="action-list">
+        <li><div class="num">1</div><div>Acesse <b>vercel.com</b> e clique em <b>"Sign up"</b></div></li>
+        <li><div class="num">2</div><div>Escolha <b>"Continue with GitHub"</b> — assim ele conecta automaticamente</div></li>
+        <li><div class="num">3</div><div>Clique em <b>"New Project"</b> → selecione seu repositório <code>meu-saas</code></div></li>
+        <li><div class="num">4</div><div>Clique em <b>"Deploy"</b> e aguarde ~2 minutos</div></li>
+        <li><div class="num">5</div><div>Seu site estará no ar com um link tipo: <code>meu-saas.vercel.app</code></div></li>
+      </ul>
+      <div class="link-box">🌐 Site de referência: <a href="https://vercel.com" target="_blank">vercel.com</a> — é o "servidor" gratuito do seu produto</div>
+      <div class="tip">✅ <strong>Seu produto está no ar!</strong> Qualquer pessoa do mundo pode acessar pelo link.</div>
+    </div>
+  </div>
+
+  <!-- PASSO 4 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Configurar o recebimento de pagamentos <span class="tag">20 min</span></div>
+        <div class="step-subtitle">Como receber dinheiro no Pix — sem taxa de mensalidade</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Para começar sem gastar nada, você vai usar o <b>Mercado Pago</b> para criar um link de pagamento recorrente (assinatura). É simples e gratuito — o Mercado Pago só cobra uma pequena taxa por transação.</p>
+      <ul class="action-list">
+        <li><div class="num">1</div><div>Acesse <b>mercadopago.com.br</b> e crie sua conta (pode ser com CPF mesmo)</div></li>
+        <li><div class="num">2</div><div>Vá em <b>"Cobranças"</b> → <b>"Link de pagamento"</b></div></li>
+        <li><div class="num">3</div><div>Crie 2 links: um de R$97/mês (plano Básico) e um de R$197/mês (plano Pro)</div></li>
+        <li><div class="num">4</div><div>Guarde esses links — você vai mandar para seus clientes</div></li>
+        <li><div class="num">5</div><div>Quando o cliente pagar, você ativa a conta dele manualmente no começo</div></li>
+      </ul>
+      <div class="warning">⚠️ <strong>No início</strong>, você vai ativar clientes manualmente (enviar o acesso por WhatsApp). Conforme crescer, pode automatizar com ferramentas como <b>Zapier</b> (também tem plano grátis).</div>
+      <div class="tip">✅ <strong>Alternativa mais simples:</strong> Use seu Pix normal para receber, e mande o acesso pelo WhatsApp. Funciona perfeitamente no começo!</div>
+    </div>
+  </div>
+
+  <!-- PASSO 5 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-title">Conseguir seus primeiros clientes <span class="tag">Contínuo</span></div>
+        <div class="step-subtitle">Como divulgar sem gastar nada com anúncios</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>A estratégia mais eficiente para iniciante é o <b>contato direto</b>. Pequenos negócios locais adoram ferramentas que economizam tempo. Veja como abordar:</p>
+
+      <p style="margin-top:14px"><b>🎯 Quem abordar primeiro:</b></p>
+      <ul class="action-list">
+        <li><div class="num">①</div><div>Restaurantes e lanchonetes do seu bairro</div></li>
+        <li><div class="num">②</div><div>Salões de beleza e barbearias</div></li>
+        <li><div class="num">③</div><div>Personal trainers e academias</div></li>
+        <li><div class="num">④</div><div>Dentistas, psicólogos, fisioterapeutas</div></li>
+        <li><div class="num">⑤</div><div>Lojas de roupas e acessórios locais</div></li>
+      </ul>
+
+      <p style="margin-top:14px"><b>💬 Mensagem no WhatsApp (copie e personalize):</b></p>
+      <div style="background:#f8f7ff;border:1px solid #ede9fe;border-radius:12px;padding:16px;margin:12px 0;font-size:14px;color:#374151;font-style:italic;line-height:1.7">
+        "Oi [Nome]! Vi que vocês têm o [negócio]. Criei uma ferramenta de IA que gera posts prontos para o Instagram, WhatsApp e email automaticamente. Você digita sobre o que é a promoção e em segundos já sai o texto completo. Queria te dar 3 dias de teste grátis pra ver se faz sentido pro seu negócio. Posso te mandar o link?"
+      </div>
+
+      <p style="margin-top:14px"><b>📱 Estratégia de divulgação gratuita:</b></p>
+      <ul class="action-list">
+        <li><div class="num">1</div><div><b>WhatsApp:</b> mande para 20 contatos que têm negócios. Peça indicações.</div></li>
+        <li><div class="num">2</div><div><b>Instagram:</b> faça um vídeo mostrando a ferramenta funcionando (Stories ou Reels)</div></li>
+        <li><div class="num">3</div><div><b>Grupos:</b> entre em grupos de empreendedores locais no WhatsApp e Telegram</div></li>
+        <li><div class="num">4</div><div><b>Presencial:</b> vá pessoalmente em comércios do seu bairro e mostre no celular</div></li>
+      </ul>
+      <div class="tip">✅ <strong>Meta realista:</strong> Em 30 dias de esforço consistente, você consegue seus primeiros 5-10 clientes.</div>
+    </div>
+  </div>
+
+  <!-- PASSO 6 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <div>
+        <div class="step-title">Projeção financeira realista <span class="tag">Planejamento</span></div>
+        <div class="step-subtitle">Quanto você pode ganhar e em quanto tempo</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <table class="money-table">
+        <tr><th>Mês</th><th>Clientes</th><th>Receita/mês</th><th>O que fazer</th></tr>
+        <tr><td>Mês 1</td><td>3-5</td><td>R$291–485</td><td>Validar, coletar feedbacks</td></tr>
+        <tr><td>Mês 2</td><td>8-12</td><td>R$776–1.164</td><td>Melhorar o produto, pedir indicações</td></tr>
+        <tr><td>Mês 3</td><td>15-20</td><td>R$1.455–1.940</td><td>Começar a automatizar pagamentos</td></tr>
+        <tr class="highlight"><td>Mês 6</td><td>40-50</td><td>R$3.880–4.850</td><td>Renda considerável, pensar em escala</td></tr>
+      </table>
+      <div class="warning">⚠️ Esses números assumem esforço diário de divulgação. Não é automático no começo — mas a <b>renda é recorrente</b>: cada cliente paga todo mês sem você fazer nada extra.</div>
+    </div>
+  </div>
+
+  <!-- PASSO 7 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">7</div>
+      <div>
+        <div class="step-title">Ferramentas gratuitas para usar <span class="tag">Recursos</span></div>
+        <div class="step-subtitle">Tudo que você precisa, sem gastar nada</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <ul class="action-list">
+        <li><div class="num">🌐</div><div><b>Vercel</b> (vercel.com) — hospedagem grátis do seu site</div></li>
+        <li><div class="num">📦</div><div><b>GitHub</b> (github.com) — guardar os arquivos do site, grátis</div></li>
+        <li><div class="num">💳</div><div><b>Mercado Pago</b> (mercadopago.com.br) — receber pagamentos, grátis</div></li>
+        <li><div class="num">📊</div><div><b>Google Sheets</b> — controlar seus clientes em uma planilha, grátis</div></li>
+        <li><div class="num">🎨</div><div><b>Canva</b> (canva.com) — criar imagens de divulgação, grátis</div></li>
+        <li><div class="num">📱</div><div><b>WhatsApp Business</b> — comunicar com clientes profissionalmente, grátis</div></li>
+      </ul>
+      <div class="tip">✅ <strong>Custo total inicial: R$0.</strong> Você só paga quando começar a ter receita (% das transações no Mercado Pago).</div>
+    </div>
+  </div>
+
+  <!-- RESUMO FINAL -->
+  <div class="final-box">
+    <h2>🚀 Resumo da sua jornada</h2>
+    <p>
+      <b>Hoje:</b> Publicar o site no Vercel ✅<br>
+      <b>Esta semana:</b> Criar conta no Mercado Pago e oferecer para 10 pessoas<br>
+      <b>Este mês:</b> Conseguir seus primeiros 3 clientes pagantes<br>
+      <b>Em 3 meses:</b> Ter uma renda recorrente real<br><br>
+      O mais importante: <b>comece hoje</b>. Cada dia sem divulgar é um dia sem receita. O produto está pronto — agora é só mostrar para as pessoas!
+    </p>
+  </div>
+
+</div>
+</body>
+</html>

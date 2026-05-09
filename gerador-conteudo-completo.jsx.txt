@@ -1,0 +1,466 @@
+import { useState, useEffect } from "react";
+
+// ============================================================
+// BANCO DE DADOS SIMULADO (em produção real: usar Supabase grátis)
+// ============================================================
+const FAKE_USERS = {
+  "demo@email.com": { password: "123456", name: "Usuário Demo", credits: 5, plan: "gratis" },
+};
+
+const PLANS = {
+  gratis:   { label: "Grátis",   color: "#64748b", credits: 5,   price: "R$ 0" },
+  basico:   { label: "Básico",   color: "#10b981", credits: 30,  price: "R$ 97/mês" },
+  pro:      { label: "Pro",      color: "#6366f1", credits: 999, price: "R$ 197/mês" },
+};
+
+const CONTENT_TYPES = [
+  { id: "instagram", label: "Instagram",    icon: "📸", desc: "Legenda + hashtags" },
+  { id: "email",     label: "Email Mkt",    icon: "📧", desc: "Email de vendas" },
+  { id: "whatsapp",  label: "WhatsApp",     icon: "💬", desc: "Mensagem de vendas" },
+  { id: "anuncio",   label: "Anúncio",      icon: "🎯", desc: "Google/Meta Ads" },
+  { id: "blog",      label: "Blog",         icon: "✍️", desc: "Artigo completo" },
+  { id: "linkedin",  label: "LinkedIn",     icon: "💼", desc: "Post profissional" },
+];
+
+const TONES = ["Profissional", "Casual", "Urgente", "Inspirador", "Divertido", "Educativo"];
+
+// ============================================================
+// COMPONENTE PRINCIPAL
+// ============================================================
+export default function App() {
+  const [screen, setScreen] = useState("login"); // login | register | app | upgrade
+  const [user, setUser] = useState(null);
+  const [users, setUsers] = useState(FAKE_USERS);
+
+  const login = (email, password) => {
+    const u = users[email];
+    if (u && u.password === password) {
+      setUser({ ...u, email });
+      setScreen("app");
+      return null;
+    }
+    return "Email ou senha incorretos.";
+  };
+
+  const register = (name, email, password) => {
+    if (users[email]) return "Este email já está cadastrado.";
+    const newUser = { password, name, credits: 5, plan: "gratis" };
+    setUsers(prev => ({ ...prev, [email]: newUser }));
+    setUser({ ...newUser, email });
+    setScreen("app");
+    return null;
+  };
+
+  const useCredit = () => {
+    setUser(prev => ({ ...prev, credits: prev.credits - 1 }));
+  };
+
+  if (screen === "login")   return <LoginScreen onLogin={login} onGoRegister={() => setScreen("register")} />;
+  if (screen === "register") return <RegisterScreen onRegister={register} onGoLogin={() => setScreen("login")} />;
+  if (screen === "upgrade") return <UpgradeScreen user={user} onBack={() => setScreen("app")} />;
+  return <GeneratorScreen user={user} onUpgrade={() => setScreen("upgrade")} onLogout={() => { setUser(null); setScreen("login"); }} useCredit={useCredit} />;
+}
+
+// ============================================================
+// TELA DE LOGIN
+// ============================================================
+function LoginScreen({ onLogin, onGoRegister }) {
+  const [email, setEmail] = useState("demo@email.com");
+  const [password, setPassword] = useState("123456");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handle = async () => {
+    setLoading(true);
+    await new Promise(r => setTimeout(r, 600));
+    const err = onLogin(email, password);
+    if (err) setError(err);
+    setLoading(false);
+  };
+
+  return (
+    <Bg>
+      <Card>
+        <Logo />
+        <h2 style={styles.cardTitle}>Entrar na sua conta</h2>
+        <p style={styles.cardSub}>Acesse sua conta para gerar conteúdo com IA</p>
+        <div style={styles.hint}>💡 Teste rápido: email <b>demo@email.com</b> / senha <b>123456</b></div>
+        <Input label="Email" value={email} onChange={setEmail} placeholder="seu@email.com" />
+        <Input label="Senha" value={password} onChange={setPassword} placeholder="••••••" type="password" />
+        {error && <div style={styles.error}>{error}</div>}
+        <Btn onClick={handle} loading={loading}>Entrar</Btn>
+        <p style={styles.switchText}>Não tem conta? <span style={styles.link} onClick={onGoRegister}>Criar grátis</span></p>
+      </Card>
+    </Bg>
+  );
+}
+
+// ============================================================
+// TELA DE CADASTRO
+// ============================================================
+function RegisterScreen({ onRegister, onGoLogin }) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handle = async () => {
+    if (!name || !email || !password) { setError("Preencha todos os campos."); return; }
+    setLoading(true);
+    await new Promise(r => setTimeout(r, 600));
+    const err = onRegister(name, email, password);
+    if (err) setError(err);
+    setLoading(false);
+  };
+
+  return (
+    <Bg>
+      <Card>
+        <Logo />
+        <h2 style={styles.cardTitle}>Criar conta grátis</h2>
+        <p style={styles.cardSub}>5 gerações grátis para começar agora</p>
+        <Input label="Seu nome" value={name} onChange={setName} placeholder="João Silva" />
+        <Input label="Email" value={email} onChange={setEmail} placeholder="seu@email.com" />
+        <Input label="Senha" value={password} onChange={setPassword} placeholder="Mínimo 6 caracteres" type="password" />
+        {error && <div style={styles.error}>{error}</div>}
+        <Btn onClick={handle} loading={loading}>Criar conta grátis</Btn>
+        <p style={styles.switchText}>Já tem conta? <span style={styles.link} onClick={onGoLogin}>Entrar</span></p>
+      </Card>
+    </Bg>
+  );
+}
+
+// ============================================================
+// TELA PRINCIPAL DO GERADOR
+// ============================================================
+function GeneratorScreen({ user, onUpgrade, onLogout, useCredit }) {
+  const [type, setType] = useState(CONTENT_TYPES[0]);
+  const [tone, setTone] = useState("Profissional");
+  const [topic, setTopic] = useState("");
+  const [audience, setAudience] = useState("");
+  const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [totalGenerated, setTotalGenerated] = useState(0);
+  const plan = PLANS[user.plan];
+  const noCredits = user.credits <= 0;
+
+  const generate = async () => {
+    if (!topic.trim() || noCredits) return;
+    setLoading(true);
+    setResult("");
+    useCredit();
+
+    const systemPrompt = `Você é um copywriter expert em marketing digital para o mercado brasileiro.
+Crie conteúdo de alta conversão, autêntico e natural.
+Retorne APENAS o conteúdo final pronto para uso, sem explicações.`;
+
+    const userPrompt = `Crie um(a) ${type.label} sobre: "${topic}"
+Tom: ${tone}
+Público: ${audience || "geral"}
+Canal: ${type.desc}
+Inclua emojis quando apropriado. Seja criativo e persuasivo.`;
+
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages: [{ role: "user", content: userPrompt }],
+        }),
+      });
+      const data = await res.json();
+      const text = data.content?.map(b => b.text || "").join("") || "Erro ao gerar.";
+      setResult(text);
+      setTotalGenerated(n => n + 1);
+    } catch {
+      setResult("Erro de conexão. Tente novamente.");
+    }
+    setLoading(false);
+  };
+
+  const copy = () => {
+    navigator.clipboard.writeText(result);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#f8f7ff", fontFamily: "'Segoe UI', sans-serif" }}>
+      {/* TOPBAR */}
+      <div style={{ background: "#fff", borderBottom: "1px solid #ede9fe", padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 60, position: "sticky", top: 0, zIndex: 10, boxShadow: "0 1px 8px rgba(99,102,241,0.07)" }}>
+        <Logo small />
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          {/* Credits badge */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, background: noCredits ? "#fef2f2" : "#ede9fe", borderRadius: 99, padding: "6px 14px" }}>
+            <span style={{ fontSize: 16 }}>⚡</span>
+            <span style={{ fontWeight: 700, color: noCredits ? "#ef4444" : "#6366f1", fontSize: 14 }}>
+              {noCredits ? "Sem créditos" : `${user.credits} créditos`}
+            </span>
+            <span style={{ fontSize: 12, color: "#94a3b8", background: plan.color + "22", color: plan.color, borderRadius: 99, padding: "2px 8px", fontWeight: 600 }}>
+              {plan.label}
+            </span>
+          </div>
+          <span style={{ fontSize: 14, color: "#64748b" }}>Olá, <b>{user.name.split(" ")[0]}</b></span>
+          <button onClick={onLogout} style={{ background: "none", border: "1px solid #e2e8f0", borderRadius: 8, padding: "6px 12px", fontSize: 13, color: "#64748b", cursor: "pointer" }}>Sair</button>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 820, margin: "0 auto", padding: "32px 20px" }}>
+        {/* Stats bar */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 28 }}>
+          {[
+            { label: "Gerados hoje", value: totalGenerated, icon: "✨" },
+            { label: "Créditos restantes", value: user.credits, icon: "⚡" },
+            { label: "Seu plano", value: plan.label, icon: "🏷️" },
+          ].map(s => (
+            <div key={s.label} style={{ background: "#fff", borderRadius: 14, padding: "16px 20px", border: "1px solid #ede9fe", display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ fontSize: 24 }}>{s.icon}</span>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: 22, color: "#1e1b4b" }}>{s.value}</div>
+                <div style={{ fontSize: 12, color: "#94a3b8" }}>{s.label}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* No credits banner */}
+        {noCredits && (
+          <div style={{ background: "linear-gradient(135deg, #6366f1, #ec4899)", borderRadius: 16, padding: "20px 24px", marginBottom: 24, display: "flex", alignItems: "center", justifyContent: "space-between", color: "#fff" }}>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4 }}>⚡ Seus créditos acabaram!</div>
+              <div style={{ fontSize: 14, opacity: 0.9 }}>Faça upgrade para continuar gerando conteúdo com IA</div>
+            </div>
+            <button onClick={onUpgrade} style={{ background: "#fff", color: "#6366f1", border: "none", borderRadius: 10, padding: "10px 20px", fontWeight: 700, cursor: "pointer", fontSize: 14, whiteSpace: "nowrap" }}>
+              Ver planos →
+            </button>
+          </div>
+        )}
+
+        {/* Type selector */}
+        <div style={{ marginBottom: 20 }}>
+          <Label>Tipo de conteúdo</Label>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+            {CONTENT_TYPES.map(t => (
+              <button key={t.id} onClick={() => setType(t)} style={{
+                padding: "14px 10px", borderRadius: 12, border: "2px solid",
+                borderColor: type.id === t.id ? "#6366f1" : "#e2e8f0",
+                background: type.id === t.id ? "#ede9fe" : "#fff",
+                cursor: "pointer", transition: "all 0.15s", textAlign: "center",
+              }}>
+                <div style={{ fontSize: 22, marginBottom: 4 }}>{t.icon}</div>
+                <div style={{ fontWeight: 600, fontSize: 13, color: type.id === t.id ? "#4338ca" : "#374151" }}>{t.label}</div>
+                <div style={{ fontSize: 11, color: "#94a3b8" }}>{t.desc}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Form */}
+        <div style={{ background: "#fff", borderRadius: 18, border: "1px solid #ede9fe", padding: 24, marginBottom: 16 }}>
+          <div style={{ marginBottom: 16 }}>
+            <Label>Sobre o que é o conteúdo? *</Label>
+            <textarea
+              value={topic}
+              onChange={e => setTopic(e.target.value)}
+              placeholder="Ex: Vendo curso de bolo de pote online, preço R$197, parcelado em 12x"
+              rows={3}
+              style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 10, padding: "12px 14px", fontSize: 15, fontFamily: "inherit", resize: "vertical", outline: "none", boxSizing: "border-box", color: "#1e1b4b" }}
+              onFocus={e => e.target.style.borderColor = "#6366f1"}
+              onBlur={e => e.target.style.borderColor = "#e2e8f0"}
+            />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div>
+              <Label>Público-alvo (opcional)</Label>
+              <input value={audience} onChange={e => setAudience(e.target.value)} placeholder="Ex: mães de 25 a 40 anos" style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 10, padding: "12px 14px", fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", color: "#1e1b4b" }} onFocus={e => e.target.style.borderColor = "#6366f1"} onBlur={e => e.target.style.borderColor = "#e2e8f0"} />
+            </div>
+            <div>
+              <Label>Tom do conteúdo</Label>
+              <select value={tone} onChange={e => setTone(e.target.value)} style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 10, padding: "12px 14px", fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", background: "#fff", color: "#1e1b4b" }}>
+                {TONES.map(t => <option key={t}>{t}</option>)}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Generate button */}
+        <button
+          onClick={generate}
+          disabled={loading || !topic.trim() || noCredits}
+          style={{
+            width: "100%", padding: "17px", borderRadius: 14, border: "none",
+            background: (loading || !topic.trim() || noCredits) ? "#c7d2fe" : "linear-gradient(135deg, #6366f1 0%, #8b5cf6 60%, #ec4899 100%)",
+            color: "#fff", fontSize: 17, fontWeight: 700, cursor: (loading || !topic.trim() || noCredits) ? "not-allowed" : "pointer",
+            boxShadow: (loading || !topic.trim() || noCredits) ? "none" : "0 6px 24px rgba(99,102,241,0.35)",
+            transition: "all 0.2s", marginBottom: 20,
+          }}
+        >
+          {loading ? "⏳ Gerando com IA..." : noCredits ? "⚡ Faça upgrade para continuar" : `✨ Gerar ${type.label}`}
+        </button>
+
+        {/* Result */}
+        {result && (
+          <div style={{ background: "#fff", borderRadius: 18, border: "1px solid #ede9fe", padding: 24, animation: "fadeIn 0.3s ease" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <span style={{ fontWeight: 700, color: "#4338ca", fontSize: 15 }}>{type.icon} {type.label} gerado!</span>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={copy} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #6366f1", background: copied ? "#6366f1" : "transparent", color: copied ? "#fff" : "#6366f1", cursor: "pointer", fontWeight: 600, fontSize: 13, transition: "all 0.2s" }}>
+                  {copied ? "✓ Copiado!" : "Copiar"}
+                </button>
+                <button onClick={generate} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #e2e8f0", background: "transparent", color: "#64748b", cursor: "pointer", fontSize: 13 }}>
+                  🔄 Refazer
+                </button>
+              </div>
+            </div>
+            <div style={{ background: "#f8f7ff", borderRadius: 12, padding: 18, whiteSpace: "pre-wrap", lineHeight: 1.8, fontSize: 15, color: "#374151", border: "1px solid #ede9fe" }}>
+              {result}
+            </div>
+          </div>
+        )}
+
+        {/* Upgrade CTA */}
+        {!noCredits && user.plan === "gratis" && (
+          <div style={{ marginTop: 24, background: "linear-gradient(135deg, #f5f3ff, #fce7f3)", borderRadius: 16, padding: "20px 24px", border: "1px solid #ede9fe", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <div style={{ fontWeight: 700, color: "#4338ca", marginBottom: 4 }}>🚀 Quer mais créditos?</div>
+              <div style={{ fontSize: 13, color: "#64748b" }}>Plano Básico: 30 gerações por R$97/mês</div>
+            </div>
+            <button onClick={onUpgrade} style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontWeight: 700, cursor: "pointer", fontSize: 14 }}>
+              Ver planos
+            </button>
+          </div>
+        )}
+      </div>
+      <style>{`@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }`}</style>
+    </div>
+  );
+}
+
+// ============================================================
+// TELA DE UPGRADE / PLANOS
+// ============================================================
+function UpgradeScreen({ user, onBack }) {
+  return (
+    <Bg>
+      <div style={{ maxWidth: 700, margin: "0 auto", padding: "40px 20px" }}>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <Logo />
+          <h2 style={{ fontSize: 32, fontWeight: 800, color: "#fff", margin: "16px 0 8px" }}>Escolha seu plano</h2>
+          <p style={{ color: "#a5b4fc", fontSize: 16 }}>Comece grátis, escale quando quiser</p>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
+          {[
+            { key: "gratis",  name: "Grátis",  price: "R$0",     period: "",       credits: 5,   features: ["5 gerações/mês", "Todos os tipos", "Suporte por email"], highlight: false },
+            { key: "basico",  name: "Básico",  price: "R$97",    period: "/mês",   credits: 30,  features: ["30 gerações/mês", "Todos os tipos", "Suporte prioritário", "Histórico de conteúdos"], highlight: false },
+            { key: "pro",     name: "Pro",     price: "R$197",   period: "/mês",   credits: "∞", features: ["Gerações ilimitadas", "Todos os tipos", "Suporte VIP", "Histórico completo", "API de integração"], highlight: true },
+          ].map(p => (
+            <div key={p.key} style={{
+              background: p.highlight ? "linear-gradient(135deg, #6366f1, #8b5cf6)" : "rgba(255,255,255,0.08)",
+              borderRadius: 20, padding: 24, border: p.highlight ? "none" : "1px solid rgba(255,255,255,0.12)",
+              position: "relative", transform: p.highlight ? "scale(1.04)" : "scale(1)",
+            }}>
+              {p.highlight && <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: "#fbbf24", color: "#78350f", fontSize: 11, fontWeight: 800, borderRadius: 99, padding: "4px 12px", whiteSpace: "nowrap" }}>⭐ MAIS POPULAR</div>}
+              <div style={{ color: p.highlight ? "#e0e7ff" : "#94a3b8", fontSize: 13, fontWeight: 600, marginBottom: 8 }}>{p.name}</div>
+              <div style={{ color: "#fff", fontSize: 32, fontWeight: 800, lineHeight: 1 }}>{p.price}<span style={{ fontSize: 14, fontWeight: 400, opacity: 0.7 }}>{p.period}</span></div>
+              <div style={{ color: p.highlight ? "#c7d2fe" : "#64748b", fontSize: 12, marginBottom: 20, marginTop: 4 }}>{p.credits} gerações/mês</div>
+              {p.features.map(f => (
+                <div key={f} style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 10 }}>
+                  <span style={{ color: p.highlight ? "#a5b4fc" : "#6366f1", fontSize: 14 }}>✓</span>
+                  <span style={{ color: p.highlight ? "#e0e7ff" : "#94a3b8", fontSize: 13 }}>{f}</span>
+                </div>
+              ))}
+              <button style={{
+                marginTop: 16, width: "100%", padding: "12px", borderRadius: 10, border: p.highlight ? "none" : "1px solid rgba(255,255,255,0.2)",
+                background: p.highlight ? "#fff" : "rgba(255,255,255,0.08)",
+                color: p.highlight ? "#6366f1" : "#e2e8f0",
+                fontWeight: 700, cursor: "pointer", fontSize: 14,
+              }}>
+                {p.key === "gratis" ? "Plano atual" : "Assinar agora"}
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ textAlign: "center", background: "rgba(255,255,255,0.05)", borderRadius: 14, padding: 20, marginBottom: 24, border: "1px solid rgba(255,255,255,0.1)" }}>
+          <div style={{ color: "#fbbf24", fontWeight: 700, marginBottom: 8 }}>💳 Como receber pagamentos (grátis)</div>
+          <div style={{ color: "#94a3b8", fontSize: 14, lineHeight: 1.6 }}>
+            Use o <b style={{ color: "#e0e7ff" }}>Mercado Pago</b> ou <b style={{ color: "#e0e7ff" }}>PicPay</b> para receber via Pix.<br />
+            Quando alguém pagar, você libera os créditos manualmente no começo.<br />
+            É 100% gratuito e você já pode começar hoje!
+          </div>
+        </div>
+
+        <div style={{ textAlign: "center" }}>
+          <button onClick={onBack} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 10, padding: "10px 24px", color: "#94a3b8", cursor: "pointer", fontSize: 14 }}>
+            ← Voltar ao gerador
+          </button>
+        </div>
+      </div>
+    </Bg>
+  );
+}
+
+// ============================================================
+// COMPONENTES AUXILIARES
+// ============================================================
+function Bg({ children }) {
+  return (
+    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #0f0c29 0%, #1a1040 50%, #0f0c29 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, fontFamily: "'Segoe UI', sans-serif", position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "fixed", inset: 0, background: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(99,102,241,0.2) 0%, transparent 60%)", pointerEvents: "none" }} />
+      <div style={{ position: "relative", zIndex: 1, width: "100%" }}>{children}</div>
+    </div>
+  );
+}
+
+function Card({ children }) {
+  return <div style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 24, padding: 36, maxWidth: 420, margin: "0 auto", width: "100%" }}>{children}</div>;
+}
+
+function Logo({ small }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: small ? "flex-start" : "center", marginBottom: small ? 0 : 8 }}>
+      <div style={{ width: small ? 32 : 40, height: small ? 32 : 40, borderRadius: 10, background: "linear-gradient(135deg, #6366f1, #ec4899)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: small ? 16 : 20 }}>✨</div>
+      <span style={{ fontWeight: 800, fontSize: small ? 16 : 20, color: small ? "#4338ca" : "#fff", letterSpacing: -0.5 }}>ContentIA</span>
+    </div>
+  );
+}
+
+function Input({ label, value, onChange, placeholder, type = "text" }) {
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#94a3b8", marginBottom: 6 }}>{label}</label>
+      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+        style={{ width: "100%", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "12px 14px", color: "#e8e8f0", fontSize: 15, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
+        onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.7)"}
+        onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.12)"}
+      />
+    </div>
+  );
+}
+
+function Btn({ children, onClick, loading }) {
+  return (
+    <button onClick={onClick} disabled={loading} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", fontSize: 16, fontWeight: 700, cursor: loading ? "wait" : "pointer", marginTop: 8, boxShadow: "0 6px 20px rgba(99,102,241,0.35)", transition: "all 0.2s" }}>
+      {loading ? "⏳ Aguarde..." : children}
+    </button>
+  );
+}
+
+function Label({ children }) {
+  return <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 8 }}>{children}</label>;
+}
+
+const styles = {
+  cardTitle: { color: "#fff", fontSize: 24, fontWeight: 800, margin: "16px 0 6px", textAlign: "center" },
+  cardSub:   { color: "#94a3b8", fontSize: 14, textAlign: "center", margin: "0 0 24px" },
+  hint:      { background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "#a5b4fc", marginBottom: 20, textAlign: "center" },
+  error:     { background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#fca5a5", marginBottom: 12 },
+  switchText:{ textAlign: "center", color: "#64748b", fontSize: 14, marginTop: 20 },
+  link:      { color: "#a5b4fc", cursor: "pointer", fontWeight: 600 },
+};
